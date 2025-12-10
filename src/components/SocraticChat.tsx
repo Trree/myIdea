@@ -22,12 +22,14 @@ import { exportChatToMarkdown, downloadTextFile, copyToClipboard } from '@/lib/u
 
 interface SocraticChatProps {
   defaultMode?: SocraticMode;
+  prePopulatedTopic?: string;
+  onChatComplete?: (messages: ChatMessage[]) => void;
 }
 
-export default function SocraticChat({ defaultMode = 'brainstorm' }: SocraticChatProps) {
+export default function SocraticChat({ defaultMode = 'brainstorm', prePopulatedTopic, onChatComplete }: SocraticChatProps) {
   const { selectedModel, setSelectedModel } = useApp();
   const [mode, setMode] = useState<SocraticMode>(defaultMode);
-  const [topic, setTopic] = useState('');
+  const [topic, setTopic] = useState(prePopulatedTopic || '');
   const [hasStarted, setHasStarted] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [userInput, setUserInput] = useState('');
@@ -44,6 +46,13 @@ export default function SocraticChat({ defaultMode = 'brainstorm' }: SocraticCha
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // 当预填充主题改变时更新topic
+  useEffect(() => {
+    if (prePopulatedTopic && !hasStarted) {
+      setTopic(prePopulatedTopic);
+    }
+  }, [prePopulatedTopic, hasStarted]);
 
   const handleStart = async () => {
     if (!topic.trim()) return;
@@ -91,8 +100,12 @@ export default function SocraticChat({ defaultMode = 'brainstorm' }: SocraticCha
         timestamp: Date.now(),
       };
 
-      setMessages((prev) => [...prev, aiMessage]);
+      const newMessages = [...history, aiMessage];
+      setMessages(newMessages);
       setCurrentSuggestions(data.suggestions || []);
+      
+      // 通知工作流聊天更新
+      onChatComplete?.(newMessages);
     } catch (err) {
       console.error('生成问题错误:', err);
       setError(err instanceof Error ? err.message : '生成问题失败，请重试');
@@ -116,6 +129,9 @@ export default function SocraticChat({ defaultMode = 'brainstorm' }: SocraticCha
     setMessages(newHistory);
     setUserInput('');
     setCurrentSuggestions([]);
+
+    // 通知工作流聊天更新
+    onChatComplete?.(newHistory);
 
     // 生成下一个问题
     await generateNextQuestion(newHistory);
@@ -235,6 +251,7 @@ export default function SocraticChat({ defaultMode = 'brainstorm' }: SocraticCha
                         : '例如：开发一个帮助用户学习编程的 App'
                     }
                     className="text-base"
+                    disabled={!!prePopulatedTopic}
                   />
                 </div>
 

@@ -11,9 +11,11 @@ import { useState } from 'react';
 interface IdeaCardProps {
   idea: BusinessIdea;
   index: number;
+  workflowMode?: boolean;
+  onSelect?: () => void;
 }
 
-export default function IdeaCard({ idea, index }: IdeaCardProps) {
+export default function IdeaCard({ idea, index, workflowMode = false, onSelect }: IdeaCardProps) {
   const { isFavorite, addFavorite, removeFavorite } = useApp();
   const [isAnimating, setIsAnimating] = useState(false);
   const favorited = isFavorite(idea.title);
@@ -30,7 +32,13 @@ export default function IdeaCard({ idea, index }: IdeaCardProps) {
   };
 
   return (
-    <Card className="h-full hover:shadow-lg transition-shadow duration-300 animate-in fade-in slide-in-from-bottom-4" style={{ animationDelay: `${index * 100}ms` }}>
+    <Card
+      className={`h-full hover:shadow-lg transition-all duration-300 animate-in fade-in slide-in-from-bottom-4 ${
+        workflowMode ? 'cursor-pointer hover:border-blue-500 hover:shadow-blue-100 dark:hover:shadow-blue-900/20' : ''
+      }`}
+      style={{ animationDelay: `${index * 100}ms` }}
+      onClick={workflowMode ? onSelect : undefined}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
@@ -126,6 +134,22 @@ export default function IdeaCard({ idea, index }: IdeaCardProps) {
               <h4 className="text-sm font-semibold mb-1">竞争分析</h4>
               <p className="text-sm text-muted-foreground">{idea.competition}</p>
             </div>
+          </div>
+        )}
+        
+        {/* Workflow Mode Selection Button */}
+        {workflowMode && (
+          <div className="pt-4 border-t">
+            <Button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSelect?.();
+              }}
+              className="w-full"
+              size="sm"
+            >
+              选择这个创意
+            </Button>
           </div>
         )}
       </CardContent>

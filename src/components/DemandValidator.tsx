@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle2, XCircle, TrendingUp, Users, DollarSign, Search, ExternalLink } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface ValidationResult {
   isRealDemand: boolean;
@@ -18,8 +19,13 @@ interface ValidationResult {
   actionPlan: string[];
 }
 
-export default function DemandValidator() {
-  const [demand, setDemand] = useState('');
+interface DemandValidatorProps {
+  prePopulatedDemand?: string;
+  onValidationComplete?: (result: ValidationResult) => void;
+}
+
+export default function DemandValidator({ prePopulatedDemand, onValidationComplete }: DemandValidatorProps) {
+  const [demand, setDemand] = useState(prePopulatedDemand || '');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [error, setError] = useState('');
@@ -47,12 +53,20 @@ export default function DemandValidator() {
 
       const data = await response.json();
       setResult(data);
+      onValidationComplete?.(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : '验证过程出错，请重试');
     } finally {
       setIsLoading(false);
     }
   };
+
+  // 当预填充需求改变时更新demand
+  useEffect(() => {
+    if (prePopulatedDemand) {
+      setDemand(prePopulatedDemand);
+    }
+  }, [prePopulatedDemand]);
 
   const getScoreColor = (score: number) => {
     if (score >= 70) return 'text-green-600 dark:text-green-400';
@@ -216,6 +230,7 @@ export default function DemandValidator() {
                 value={demand}
                 onChange={(e) => setDemand(e.target.value)}
                 className="mt-2"
+                disabled={!!prePopulatedDemand}
               />
             </div>
             {error && (
@@ -298,9 +313,9 @@ export default function DemandValidator() {
 
                 <div className="pt-4 border-t">
                   <h4 className="font-semibold mb-2">分析说明</h4>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {result.reasoning}
-                  </p>
+                  <div className="text-sm text-muted-foreground prose prose-sm max-w-none dark:prose-invert">
+                    <ReactMarkdown>{result.reasoning}</ReactMarkdown>
+                  </div>
                 </div>
               </div>
             </CardContent>

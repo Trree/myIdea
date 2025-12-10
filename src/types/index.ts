@@ -180,3 +180,17 @@ export interface SocraticResponse {
   suggestions?: string[];
   insights?: string;
 }
+
+// ============================================
+// 需求验证
+// ============================================
+
+export interface ValidationResult {
+  isRealDemand: boolean;
+  score: number;
+  frequency: 'high' | 'medium' | 'low';
+  painPoint: 'strong' | 'medium' | 'weak';
+  paymentWillingness: 'high' | 'medium' | 'low';
+  reasoning: string;
+  actionPlan: string[];
+}

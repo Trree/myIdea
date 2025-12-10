@@ -26,7 +26,15 @@ import { useApp } from '@/contexts/AppContext';
 import { exportIdeasToMarkdown, downloadTextFile, copyToClipboard } from '@/lib/utils/export';
 import { IdeaGeneratorSkeleton } from './ui/skeleton';
 
-export default function IdeaGenerator() {
+interface IdeaGeneratorProps {
+  workflowMode?: boolean;
+  onIdeaSelected?: (idea: BusinessIdea, index: number) => void;
+}
+
+export default function IdeaGenerator({
+  workflowMode = false,
+  onIdeaSelected
+}: IdeaGeneratorProps = {}) {
   const { selectedModel, setSelectedModel, addToHistory } = useApp();
   const [interests, setInterests] = useState('');
   const [generationType, setGenerationType] =
@@ -326,7 +334,13 @@ export default function IdeaGenerator() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {ideas.map((idea, index) => (
-                <IdeaCard key={index} idea={idea} index={index} />
+                <IdeaCard
+                  key={index}
+                  idea={idea}
+                  index={index}
+                  workflowMode={workflowMode}
+                  onSelect={onIdeaSelected ? () => onIdeaSelected(idea, index) : undefined}
+                />
               ))}
             </div>
 

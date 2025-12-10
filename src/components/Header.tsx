@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Lightbulb, Menu, X, Moon, Sun } from 'lucide-react';
+import { Lightbulb, Menu, X, Moon, Sun, Workflow } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from './ui/button';
 import { useApp } from '@/contexts/AppContext';
@@ -22,6 +22,13 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
+            <Link
+              href="/workflow"
+              className="text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+            >
+              <Workflow className="h-4 w-4" />
+              智能工作流
+            </Link>
             <Link
               href="/#generator"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -69,7 +76,7 @@ export default function Header() {
               )}
             </Button>
             <Button asChild>
-              <Link href="/#generator">开始生成</Link>
+              <Link href="/workflow">开始工作流</Link>
             </Button>
           </div>
 
@@ -106,6 +113,14 @@ export default function Header() {
           <div className="md:hidden py-4 border-t animate-in slide-in-from-top-2">
             <nav className="flex flex-col space-y-4">
               <Link
+                href="/workflow"
+                className="text-sm font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Workflow className="h-4 w-4" />
+                智能工作流
+              </Link>
+              <Link
                 href="/#generator"
                 className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
@@ -141,8 +156,8 @@ export default function Header() {
                 功能特色
               </Link>
               <Button asChild className="w-full">
-                <Link href="/#generator" onClick={() => setMobileMenuOpen(false)}>
-                  开始生成
+                <Link href="/workflow" onClick={() => setMobileMenuOpen(false)}>
+                  开始工作流
                 </Link>
               </Button>
             </nav>
