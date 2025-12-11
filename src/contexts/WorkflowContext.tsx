@@ -56,6 +56,7 @@ interface WorkflowContextType {
   // 工作流控制
   startNewWorkflow: () => void;
   clearWorkflow: () => void;
+  resetToFirstStep: () => void;
   enterWorkflowMode: () => void;
   exitWorkflowMode: () => void;
 }
@@ -297,6 +298,23 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     setIsInWorkflowMode(false);
   }, []);
   
+  // 重置到第一步
+  const resetToFirstStep = useCallback(() => {
+    setState((prev: WorkflowState) => ({
+      ...prev,
+      currentStep: 'generate',
+      history: [
+        ...prev.history,
+        {
+          step: 'generate',
+          timestamp: Date.now(),
+          action: 'jump',
+        },
+      ],
+      lastModifiedAt: Date.now(),
+    }));
+  }, []);
+  
   // 权限检查方法
   const canGoToStep = useCallback(
     (targetStep: WorkflowStep) => canNavigateToStep(targetStep, state),
@@ -322,6 +340,7 @@ export function WorkflowProvider({ children }: { children: ReactNode }) {
     saveValidationResult,
     startNewWorkflow,
     clearWorkflow,
+    resetToFirstStep,
     enterWorkflowMode,
     exitWorkflowMode,
   };

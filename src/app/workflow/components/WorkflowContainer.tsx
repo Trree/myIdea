@@ -9,16 +9,17 @@ import RefineStep from './RefineStep';
 import ValidateStep from './ValidateStep';
 
 export default function WorkflowContainer() {
-  const { state, enterWorkflowMode } = useWorkflow();
+  const { state, enterWorkflowMode, resetToFirstStep } = useWorkflow();
   
   useEffect(() => {
-    // 进入工作流模式
+    // 进入工作流模式并确保从第一步开始
     enterWorkflowMode();
+    resetToFirstStep();
     
     return () => {
       // 可选：退出时清理
     };
-  }, [enterWorkflowMode]);
+  }, [enterWorkflowMode, resetToFirstStep]);
   
   const renderCurrentStep = () => {
     switch (state.currentStep) {
